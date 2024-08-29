@@ -21,7 +21,7 @@ const plugin = {
 
 const recommended = {
   plugins: {
-    starter: plugin,
+    'next-x': plugin,
   },
   rules,
 }

@@ -1,5 +1,5 @@
-import { rule as noLoopOverEnum } from './no-loop-over-enum.js'
+import { rule as requireGetServerSideProps } from './require-get-server-side-props.js'
 
 export const rules = {
-  'no-loop-over-enum': noLoopOverEnum,
+  'require-get-server-side-props': requireGetServerSideProps,
 }

@@ -1,4 +1,4 @@
-# starter-eslint-plugin
+# eslint-plugin-next-x
 
 [![npm version][npm-version-src]][npm-version-href]
 [![npm downloads][npm-downloads-src]][npm-downloads-href]
@@ -13,7 +13,7 @@ Starter template for eslint plugin
 ### Install
 
 ```bash
-npm i -D starter-eslint-plugin
+npm i -D eslint-plugin-next-x
 ```
 
 ### Configure
@@ -22,15 +22,15 @@ We recommend using [ESLint's Flat Config format](https://eslint.org/docs/latest/
 
 ```ts
 // eslint.config.js
-import starter from 'starter-eslint-plugin'
+import nextX from 'eslint-plugin-next-x'
 
 export default [
   {
     plugins: {
-      starter,
+      'next-x': nextX,
     },
     rules: {
-      'starter/no-loop-over-enum': 'warn',
+      'next-x/require-get-server-side-props': 'warn',
     },
   },
 ]
@@ -38,17 +38,9 @@ export default [
 
 ## Rules
 
-💭 Requires [type information](https://typescript-eslint.io/linting/typed-linting).
-
-| Name                                                 | Description               | 💭  |
-| :--------------------------------------------------- | :------------------------ | :-- |
-| [no-loop-over-enum](docs/rules/no-loop-over-enum.md) | Avoid looping over enums. | 💭  |
-
-## Credits
-
-Thanks to the existing works for references and inspiration.
-
-- [eslint-plugin-format](https://github.com/antfu/eslint-plugin-format)
+| Name                                                                         | Description                 | 💭  |
+| :--------------------------------------------------------------------------- | :-------------------------- | :-- |
+| [require-get-server-side-props](docs/rules/require-get-server-side-props.md) | Required getServerSideProps |     |
 
 ## License
 
@@ -56,13 +48,13 @@ Thanks to the existing works for references and inspiration.
 
 <!-- Badges -->
 
-[npm-version-src]: https://img.shields.io/npm/v/starter-eslint-plugin?style=flat&colorA=080f12&colorB=1fa669
-[npm-version-href]: https://npmjs.com/package/starter-eslint-plugin
-[npm-downloads-src]: https://img.shields.io/npm/dm/starter-eslint-plugin?style=flat&colorA=080f12&colorB=1fa669
-[npm-downloads-href]: https://npmjs.com/package/starter-eslint-plugin
-[bundle-src]: https://img.shields.io/bundlephobia/minzip/starter-eslint-plugin?style=flat&colorA=080f12&colorB=1fa669&label=minzip
-[bundle-href]: https://bundlephobia.com/result?p=starter-eslint-plugin
-[license-src]: https://img.shields.io/github/license/antfu/starter-eslint-plugin.svg?style=flat&colorA=080f12&colorB=1fa669
-[license-href]: https://github.com/antfu/starter-eslint-plugin/blob/main/LICENSE
+[npm-version-src]: https://img.shields.io/npm/v/eslint-plugin-next-x?style=flat&colorA=080f12&colorB=1fa669
+[npm-version-href]: https://npmjs.com/package/eslint-plugin-next-x
+[npm-downloads-src]: https://img.shields.io/npm/dm/eslint-plugin-next-x?style=flat&colorA=080f12&colorB=1fa669
+[npm-downloads-href]: https://npmjs.com/package/eslint-plugin-next-x
+[bundle-src]: https://img.shields.io/bundlephobia/minzip/eslint-plugin-next-x?style=flat&colorA=080f12&colorB=1fa669&label=minzip
+[bundle-href]: https://bundlephobia.com/result?p=eslint-plugin-next-x
+[license-src]: https://img.shields.io/github/license/antfu/eslint-plugin-next-x.svg?style=flat&colorA=080f12&colorB=1fa669
+[license-href]: https://github.com/antfu/eslint-plugin-next-x/blob/main/LICENSE
 [jsdocs-src]: https://img.shields.io/badge/jsdocs-reference-080f12?style=flat&colorA=080f12&colorB=1fa669
-[jsdocs-href]: https://www.jsdocs.io/package/starter-eslint-plugin
+[jsdocs-href]: https://www.jsdocs.io/package/eslint-plugin-next-x
