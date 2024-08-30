@@ -2,92 +2,99 @@ import { AST_NODE_TYPES } from '@typescript-eslint/utils'
 
 import { createRule, getCalleeMeta } from '../helpers'
 
+import type { TSESTree } from '@typescript-eslint/utils'
+
 export interface Options {
   style?: 'variable' | 'function' | {
     declarator: 'variable'
-    callExpressionName?: string
+    callExpressionNames?: string[]
   }
 }
 
 type MessageIds =
   | 'requiredGetServerSideProps'
-  | 'requiredGetServerSidePropsWithCallExpressionName'
+  | 'requiredGetServerSidePropsWith'
 
 export const rule = createRule<[Options], MessageIds>({
   create(context, [options]) {
     return {
       Program(node) {
-        const result = node.body.find((statement) => {
-          if (statement.type !== AST_NODE_TYPES.ExportNamedDeclaration) {
-            return null
-          }
-          const declaration = statement.declaration
-          if (!declaration) {
-            return null
-          }
+        const { body } = node
 
-          const getTargetStatement = () => {
-            if (declaration?.type === AST_NODE_TYPES.VariableDeclaration) {
+        const exportNamedGetServerSidePropsDeclarations = body.filter((statement) => {
+          if (statement.type === AST_NODE_TYPES.ExportNamedDeclaration) {
+            const declaration = statement.declaration
+            if (!declaration) {
+              return false
+            }
+            if (declaration.type === AST_NODE_TYPES.VariableDeclaration) {
               const [declarationItem] = declaration.declarations
-              if (declarationItem.id.type === AST_NODE_TYPES.Identifier && declarationItem.id.name === 'getServerSideProps') {
-                const init = declarationItem.init
-                const callee = init?.type === AST_NODE_TYPES.CallExpression ? init : null
-                return { type: 'variable', statement, callee } as const
-              }
+              return declarationItem.id?.type === AST_NODE_TYPES.Identifier && declarationItem.id.name === 'getServerSideProps'
             }
-            if (declaration.type === AST_NODE_TYPES.FunctionDeclaration && declaration.id?.type === AST_NODE_TYPES.Identifier
-              && declaration.id.name === 'getServerSideProps') {
-              return { type: 'function', statement } as const
+            if (declaration.type === AST_NODE_TYPES.FunctionDeclaration) {
+              return declaration.id?.type === AST_NODE_TYPES.Identifier && declaration.id.name === 'getServerSideProps'
             }
+          }
+          return false
+        }) as (TSESTree.ExportNamedDeclarationWithoutSourceWithMultiple | TSESTree.ExportNamedDeclarationWithoutSourceWithSingle | TSESTree.ExportNamedDeclarationWithSource)[]
+
+        const getServerSidePropsCount = exportNamedGetServerSidePropsDeclarations.length
+
+        if (getServerSidePropsCount === 0) {
+          return context.report({
+            messageId: 'requiredGetServerSideProps',
+            node: context.sourceCode.ast,
+          })
+        }
+
+        if (getServerSidePropsCount !== 1) {
+          console.warn(`Number of getServerSideProps: ${getServerSidePropsCount}`)
+          return
+        }
+
+        if (!options.style) {
+          return
+        }
+
+        if (options.style === 'function' || options.style === 'variable') {
+          return
+        }
+
+        const { callExpressionNames } = options.style
+
+        if (!callExpressionNames || callExpressionNames.length === 0) {
+          return
+        }
+
+        const [targetExported] = exportNamedGetServerSidePropsDeclarations
+        const declaration = targetExported.declaration!
+
+        const reportMessageWith = () => {
+          return context.report({
+            messageId: 'requiredGetServerSidePropsWith',
+            node: context.sourceCode.ast,
+            data: {
+              names: callExpressionNames.join(', '),
+            },
+          })
+        }
+
+        if (declaration.type === AST_NODE_TYPES.VariableDeclaration) {
+          const [declarationItem] = declaration.declarations
+          const init = declarationItem.init
+          const callee = init?.type === AST_NODE_TYPES.CallExpression ? init : null
+
+          if (!callee) {
+            return reportMessageWith()
+          }
+
+          const calleeMeta = getCalleeMeta(callee)
+          if (callExpressionNames.includes(calleeMeta.name)) {
             return null
           }
-
-          const target = getTargetStatement()
-
-          if (!target) {
-            return null
-          }
-
-          if (!options.style) {
-            return target.statement
-          }
-
-          if (options.style === 'function') {
-            return target.type === 'function' ? target.statement : null
-          }
-          if (typeof options.style !== 'string') {
-            const callExpressionName = options.style.callExpressionName?.trim()
-            if (!callExpressionName) {
-              return target.type === 'variable' ? target.statement : null
-            }
-            const callee = target.callee
-            if (!callee) {
-              return null
-            }
-            const calleeMeta = getCalleeMeta(callee)
-            if (calleeMeta.name === callExpressionName) {
-              return target.statement
-            }
-            return null
-          }
-          return target.type === 'variable' ? target.statement : null
-        })
-
-        if (!result) {
-          if (options.style && typeof options.style !== 'string' && options.style.callExpressionName?.trim()) {
-            context.report({
-              messageId: 'requiredGetServerSidePropsWithCallExpressionName',
-              node: context.sourceCode.ast,
-              data: {
-                name: options.style.callExpressionName.trim(),
-              },
-            })
-          } else {
-            context.report({
-              messageId: 'requiredGetServerSideProps',
-              node: context.sourceCode.ast,
-            })
-          }
+          return reportMessageWith()
+        } else {
+          return reportMessageWith()
         }
       },
     }
@@ -98,7 +105,7 @@ export const rule = createRule<[Options], MessageIds>({
     },
     messages: {
       requiredGetServerSideProps: 'Required getServerSideProps',
-      requiredGetServerSidePropsWithCallExpressionName: 'Required getServerSideProps by variable declaration with function called "{{ name }}"',
+      requiredGetServerSidePropsWith: 'Required getServerSideProps by variable declaration with function called "{{ names }}"',
     },
     type: 'problem',
     // ref: https://github.com/typescript-eslint/typescript-eslint/blob/main/packages/eslint-plugin/tests/schema-snapshots/ban-ts-comment.shot
@@ -117,8 +124,11 @@ export const rule = createRule<[Options], MessageIds>({
                   type: 'string',
                   enum: ['variable'],
                 },
-                callExpressionName: {
-                  type: 'string',
+                callExpressionNames: {
+                  type: 'array',
+                  items: {
+                    type: 'string',
+                  },
                 },
               },
             },

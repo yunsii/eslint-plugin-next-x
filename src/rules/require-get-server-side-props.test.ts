@@ -26,7 +26,7 @@ run({
       options: {
         style: {
           declarator: 'variable',
-          callExpressionName: 'getServerSideData',
+          callExpressionNames: ['getServerSideData'],
         },
       },
     },
@@ -45,7 +45,7 @@ run({
       options: {
         style: {
           declarator: 'variable',
-          callExpressionName: 'getServerSideData',
+          callExpressionNames: ['getServerSideData'],
         },
       },
     },
@@ -56,66 +56,34 @@ run({
       options: {
         style: {
           declarator: 'variable',
-          callExpressionName: 'getServerSideData',
+          callExpressionNames: ['getServerSideData'],
         },
       },
-      errors: [
-        {
-          column: 1,
-          endColumn: 43,
-          line: 1,
-          endLine: 1,
-          messageId: 'requiredGetServerSidePropsWithCallExpressionName',
-        },
-      ],
+      errors: ['requiredGetServerSidePropsWith'],
     },
     {
       code: `export function getServerSideProps() {}`,
       options: {
         style: {
           declarator: 'variable',
-          callExpressionName: 'getServerSideData',
+          callExpressionNames: ['getServerSideData'],
         },
       },
-      errors: [
-        {
-          column: 1,
-          endColumn: 40,
-          line: 1,
-          endLine: 1,
-          messageId: 'requiredGetServerSidePropsWithCallExpressionName',
-        },
-      ],
+      errors: ['requiredGetServerSidePropsWith'],
     },
     {
       code: `export const getServerSideProps = getServerSideDataCopy()(() => {})`,
       options: {
         style: {
           declarator: 'variable',
-          callExpressionName: 'getServerSideData',
+          callExpressionNames: ['getServerSideData'],
         },
       },
-      errors: [
-        {
-          column: 1,
-          endColumn: 68,
-          line: 1,
-          endLine: 1,
-          messageId: 'requiredGetServerSidePropsWithCallExpressionName',
-        },
-      ],
+      errors: ['requiredGetServerSidePropsWith'],
     },
     {
       code: 'export default function Page  ()  {}',
-      errors: [
-        {
-          column: 1,
-          endColumn: 37,
-          line: 1,
-          endLine: 1,
-          messageId: 'requiredGetServerSideProps',
-        },
-      ],
+      errors: ['requiredGetServerSideProps'],
     },
     {
       code: $`
@@ -123,15 +91,7 @@ run({
           return null
         }
       `,
-      errors: [
-        {
-          column: 1,
-          endColumn: 2,
-          line: 1,
-          endLine: 3,
-          messageId: 'requiredGetServerSideProps',
-        },
-      ],
+      errors: ['requiredGetServerSideProps'],
     },
     {
       code: $`
@@ -148,10 +108,10 @@ run({
       options: {
         style: {
           declarator: 'variable',
-          callExpressionName: 'getServerSideData',
+          callExpressionNames: ['getServerSideData'],
         },
       },
-      errors: ['requiredGetServerSidePropsWithCallExpressionName'],
+      errors: ['requiredGetServerSidePropsWith'],
     },
   ],
 })
