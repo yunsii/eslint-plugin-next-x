@@ -45,5 +45,8 @@
     "less",
     "scss",
     "sass"
+  ],
+  "cSpell.words": [
+    "TSES"
   ]
 }

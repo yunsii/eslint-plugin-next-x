@@ -31,6 +31,15 @@ run({
       },
     },
     {
+      code: `export const getServerSideProps = getServerSideDataIdentifier`,
+      options: {
+        style: {
+          declarator: 'variable',
+          identifierNames: ['getServerSideDataIdentifier'],
+        },
+      },
+    },
+    {
       code: $`
         const Page: NextPage = () => {
           return (
@@ -59,7 +68,7 @@ run({
           callExpressionNames: ['getServerSideData'],
         },
       },
-      errors: ['requiredGetServerSidePropsWith'],
+      errors: ['requiredGetServerSidePropsWithCallExpressionNames'],
     },
     {
       code: `export function getServerSideProps() {}`,
@@ -69,7 +78,7 @@ run({
           callExpressionNames: ['getServerSideData'],
         },
       },
-      errors: ['requiredGetServerSidePropsWith'],
+      errors: ['requiredGetServerSidePropsWithCallExpressionNames'],
     },
     {
       code: `export const getServerSideProps = getServerSideDataCopy()(() => {})`,
@@ -79,7 +88,7 @@ run({
           callExpressionNames: ['getServerSideData'],
         },
       },
-      errors: ['requiredGetServerSidePropsWith'],
+      errors: ['requiredGetServerSidePropsWithCallExpressionNames'],
     },
     {
       code: 'export default function Page  ()  {}',
@@ -109,6 +118,17 @@ run({
         style: {
           declarator: 'variable',
           callExpressionNames: ['getServerSideData'],
+        },
+      },
+      errors: ['requiredGetServerSidePropsWithCallExpressionNames'],
+    },
+    {
+      code: `export const getServerSideProps = foo`,
+      options: {
+        style: {
+          declarator: 'variable',
+          callExpressionNames: ['getServerSideData'],
+          identifierNames: ['getServerSideDataIdentifier'],
         },
       },
       errors: ['requiredGetServerSidePropsWith'],

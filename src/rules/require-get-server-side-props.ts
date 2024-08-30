@@ -8,11 +8,14 @@ export interface Options {
   style?: 'variable' | 'function' | {
     declarator: 'variable'
     callExpressionNames?: string[]
+    identifierNames?: string[]
   }
 }
 
 type MessageIds =
   | 'requiredGetServerSideProps'
+  | 'requiredGetServerSidePropsWithCallExpressionNames'
+  | 'requiredGetServerSidePropsWithIdentifierNames'
   | 'requiredGetServerSidePropsWith'
 
 export const rule = createRule<[Options], MessageIds>({
@@ -60,9 +63,9 @@ export const rule = createRule<[Options], MessageIds>({
           return
         }
 
-        const { callExpressionNames } = options.style
+        const { callExpressionNames = [], identifierNames = [] } = options.style
 
-        if (!callExpressionNames || callExpressionNames.length === 0) {
+        if (callExpressionNames.length === 0 && identifierNames.length === 0) {
           return
         }
 
@@ -70,11 +73,30 @@ export const rule = createRule<[Options], MessageIds>({
         const declaration = targetExported.declaration!
 
         const reportMessageWith = () => {
+          if (callExpressionNames.length !== 0 && identifierNames.length !== 0) {
+            return context.report({
+              messageId: 'requiredGetServerSidePropsWith',
+              node: context.sourceCode.ast,
+              data: {
+                callExpressionNames: callExpressionNames.join('/'),
+                identifierNames: identifierNames.join('/'),
+              },
+            })
+          }
+          if (callExpressionNames.length !== 0) {
+            return context.report({
+              messageId: 'requiredGetServerSidePropsWithCallExpressionNames',
+              node: context.sourceCode.ast,
+              data: {
+                callExpressionNames: callExpressionNames.join('/'),
+              },
+            })
+          }
           return context.report({
-            messageId: 'requiredGetServerSidePropsWith',
+            messageId: 'requiredGetServerSidePropsWithIdentifierNames',
             node: context.sourceCode.ast,
             data: {
-              names: callExpressionNames.join(', '),
+              identifierNames: identifierNames.join('/'),
             },
           })
         }
@@ -82,14 +104,23 @@ export const rule = createRule<[Options], MessageIds>({
         if (declaration.type === AST_NODE_TYPES.VariableDeclaration) {
           const [declarationItem] = declaration.declarations
           const init = declarationItem.init
-          const callee = init?.type === AST_NODE_TYPES.CallExpression ? init : null
 
-          if (!callee) {
+          if (!init) {
             return reportMessageWith()
           }
 
-          const calleeMeta = getCalleeMeta(callee)
-          if (callExpressionNames.includes(calleeMeta.name)) {
+          if (init.type === AST_NODE_TYPES.CallExpression) {
+            const callee = init.type === AST_NODE_TYPES.CallExpression ? init : null
+
+            if (!callee) {
+              return reportMessageWith()
+            }
+
+            const calleeMeta = getCalleeMeta(callee)
+            if (callExpressionNames.includes(calleeMeta.name)) {
+              return null
+            }
+          } else if (init.type === AST_NODE_TYPES.Identifier && identifierNames.includes(init.name)) {
             return null
           }
           return reportMessageWith()
@@ -104,8 +135,10 @@ export const rule = createRule<[Options], MessageIds>({
       description: 'Required getServerSideProps',
     },
     messages: {
-      requiredGetServerSideProps: 'Required getServerSideProps',
-      requiredGetServerSidePropsWith: 'Required getServerSideProps by variable declaration with function called "{{ names }}"',
+      requiredGetServerSideProps: 'Required getServerSideProps.',
+      requiredGetServerSidePropsWithCallExpressionNames: 'Required getServerSideProps by variable declaration with function called [{{ callExpressionNames }}].',
+      requiredGetServerSidePropsWithIdentifierNames: 'Required getServerSideProps by variable declaration with identifier named [{{ identifierNames }}].',
+      requiredGetServerSidePropsWith: 'Required getServerSideProps by variable declaration with function called [{{ callExpressionNames }}] or identifier named [{{ identifierNames }}].',
     },
     type: 'problem',
     // ref: https://github.com/typescript-eslint/typescript-eslint/blob/main/packages/eslint-plugin/tests/schema-snapshots/ban-ts-comment.shot
@@ -125,6 +158,12 @@ export const rule = createRule<[Options], MessageIds>({
                   enum: ['variable'],
                 },
                 callExpressionNames: {
+                  type: 'array',
+                  items: {
+                    type: 'string',
+                  },
+                },
+                identifierNames: {
                   type: 'array',
                   items: {
                     type: 'string',
