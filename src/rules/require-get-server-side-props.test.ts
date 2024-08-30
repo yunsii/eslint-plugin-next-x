@@ -28,6 +28,42 @@ run({
   ],
   invalid: [
     {
+      code: `export const getServerSideProps = () => {}`,
+      options: {
+        style: {
+          declarator: 'variable',
+          callExpressionName: 'getServerSideData',
+        },
+      },
+      errors: [
+        {
+          column: 1,
+          endColumn: 43,
+          line: 1,
+          endLine: 1,
+          messageId: 'requiredGetServerSidePropsWithCallExpressionName',
+        },
+      ],
+    },
+    {
+      code: `export function getServerSideProps() {}`,
+      options: {
+        style: {
+          declarator: 'variable',
+          callExpressionName: 'getServerSideData',
+        },
+      },
+      errors: [
+        {
+          column: 1,
+          endColumn: 40,
+          line: 1,
+          endLine: 1,
+          messageId: 'requiredGetServerSidePropsWithCallExpressionName',
+        },
+      ],
+    },
+    {
       code: `export const getServerSideProps = getServerSideDataCopy()(() => {})`,
       options: {
         style: {
