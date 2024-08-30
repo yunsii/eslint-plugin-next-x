@@ -8,6 +8,11 @@ run({
   rule,
   languageOptions: {
     parser: tsParser,
+    parserOptions: {
+      ecmaFeatures: {
+        jsx: true,
+      },
+    } satisfies tsParser.ParserOptions,
   },
   valid: [
     'export const getServerSideProps = () => {}',
@@ -18,6 +23,25 @@ run({
     `,
     {
       code: `export const getServerSideProps = getServerSideData()(() => {})`,
+      options: {
+        style: {
+          declarator: 'variable',
+          callExpressionName: 'getServerSideData',
+        },
+      },
+    },
+    {
+      code: $`
+        const Page: NextPage = () => {
+          return (
+            <div className='container'>
+              Hello
+            </div>
+          )
+        }
+        export default Page
+        export const getServerSideProps = getServerSideData()
+      `,
       options: {
         style: {
           declarator: 'variable',
@@ -108,6 +132,26 @@ run({
           messageId: 'requiredGetServerSideProps',
         },
       ],
+    },
+    {
+      code: $`
+        const Page: NextPage = () => {
+          return (
+            <div className='container'>
+              Hello
+            </div>
+          )
+        }
+        export default Page
+        export function getServerSideProps() {}
+      `,
+      options: {
+        style: {
+          declarator: 'variable',
+          callExpressionName: 'getServerSideData',
+        },
+      },
+      errors: ['requiredGetServerSidePropsWithCallExpressionName'],
     },
   ],
 })
