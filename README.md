@@ -54,7 +54,7 @@ export default [
 [npm-downloads-href]: https://npmjs.com/package/eslint-plugin-next-x
 [bundle-src]: https://img.shields.io/bundlephobia/minzip/eslint-plugin-next-x?style=flat&colorA=080f12&colorB=1fa669&label=minzip
 [bundle-href]: https://bundlephobia.com/result?p=eslint-plugin-next-x
-[license-src]: https://img.shields.io/github/license/antfu/eslint-plugin-next-x.svg?style=flat&colorA=080f12&colorB=1fa669
-[license-href]: https://github.com/antfu/eslint-plugin-next-x/blob/main/LICENSE
+[license-src]: https://img.shields.io/github/license/yunsii/eslint-plugin-next-x.svg?style=flat&colorA=080f12&colorB=1fa669
+[license-href]: https://github.com/yunsii/eslint-plugin-next-x/blob/main/LICENSE
 [jsdocs-src]: https://img.shields.io/badge/jsdocs-reference-080f12?style=flat&colorA=080f12&colorB=1fa669
 [jsdocs-href]: https://www.jsdocs.io/package/eslint-plugin-next-x
